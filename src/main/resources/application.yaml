@@ -1,9 +1,0 @@
-nekosoft:
-  security:
-    delegation:
-      anonymous-key: "nekosoft-runas-role-key"
-    api-key:
-      passcode: null
-      role: "ROLE_API"
-      username: null
-      header: "X-Api-Key"
