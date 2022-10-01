@@ -61,4 +61,41 @@ class RandomTextGeneratorTests {
         assertThat(s5).isNotEqualTo(s4)
     }
 
+
+    @Test
+    fun `edges pool with length is as required`() {
+        val reqLen = Random.nextInt(5, 100)
+        val str = generateRandomText(length = reqLen, edgesPool = "fed".toList())
+        assertEquals(reqLen, str.length)
+    }
+
+    @Test
+    fun `edges are within the given edges pool`() {
+        val alphabet = "ricao".toList()
+        val edgesPool = "fedmst".toList()
+        val str = generateRandomText(charPool = alphabet, edgesPool = edgesPool)
+        assertThat(edgesPool).contains(str.first())
+        assertThat(edgesPool).contains(str.last())
+        assertThat(str.drop(1).dropLast(1).toList()).allMatch { it in alphabet }
+    }
+
+    @Test
+    fun `characters are within extremely small edges`() {
+        val alphabet = "abcdefghijklmnopqrstuvwxyz".toList()
+        val edgesPool = listOf('{','}')
+        val str = generateRandomText(charPool = alphabet, edgesPool = edgesPool)
+        assertThat(edgesPool).contains(str.first())
+        assertThat(edgesPool).contains(str.last())
+        assertThat(str.drop(1).dropLast(1).toList()).allMatch { it in alphabet }
+    }
+
+    @Test
+    fun `one char edges are not allowed`() {
+        assertThrows(IllegalArgumentException::class.java) {
+            val alphabet = listOf('a')
+            val str = generateRandomText(edgesPool = alphabet)
+            println(str)
+        }
+    }
+
 }

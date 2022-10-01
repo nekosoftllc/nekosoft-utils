@@ -2,25 +2,43 @@ package org.nekosoft.utils.text
 
 // Inspired by https://www.baeldung.com/kotlin/random-alphanumeric-string
 
+import kotlin.math.abs
 import java.security.SecureRandom
 
 private const val RANDOM_TEXT_LENGTH = 9
-private const val RANDOM_TEXT_CHAR_POOL = "abcdefghijklmnopqrstuvwxyz@!%\$ABBCDEFGHIJKLMNOPQRSTUWXYZ_-#0123456789&^?"
+private const val RANDOM_TEXT_CHAR_POOL = "abcdefghijklmnopqrstuvwxyz@!%\$ABCDEFGHIJKLMNOPQRSTUWXYZ_-#0123456789&^?"
 
 fun generateRandomText(
     length: Int = RANDOM_TEXT_LENGTH,
     charPool: List<Char> = RANDOM_TEXT_CHAR_POOL.toList(),
+    edgesPool: List<Char>? = null,
 ): String {
-    if (charPool.size < 2) {
+    val poolSize = charPool.size
+    if (poolSize < 2) {
         throw IllegalArgumentException("Char pool size must be at least 2")
     }
     val random = SecureRandom()
     val bytes = ByteArray(length)
     random.nextBytes(bytes)
-    return (bytes.indices)
-        .map {
-            charPool[random.nextInt(charPool.size)]
-        }.joinToString("")
+    return if (edgesPool == null) {
+        bytes
+            .fold(StringBuilder(length)) { acc, e ->
+                acc.append(charPool[abs(e % poolSize)])
+            }.toString()
+    } else {
+        val edgesPoolSize = edgesPool.size
+        if (edgesPoolSize < 2) {
+            throw IllegalArgumentException("Char edges pool size must be at least 2")
+        }
+        val builder = StringBuilder(length)
+        builder.append(edgesPool[abs(bytes.first() % edgesPoolSize)])
+        bytes.drop(1).dropLast(1)
+            .fold(builder) { acc, e ->
+                acc.append(charPool[abs(e % poolSize)])
+            }
+        builder.append(edgesPool[abs(bytes.last() % edgesPoolSize)])
+        builder.toString()
+    }
 }
 
 fun tokenizeCommandLineString(args: String): Array<String> {
