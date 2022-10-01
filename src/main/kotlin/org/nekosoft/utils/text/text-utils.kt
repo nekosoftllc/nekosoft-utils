@@ -11,7 +11,14 @@ private const val RANDOM_TEXT_CHAR_POOL = "abcdefghijklmnopqrstuvwxyz@!%\$ABCDEF
 fun generateRandomText(
     length: Int = RANDOM_TEXT_LENGTH,
     charPool: List<Char> = RANDOM_TEXT_CHAR_POOL.toList(),
-    edgesPool: List<Char>? = null,
+    edgesPool: List<Char>?,
+): String = generateRandomText(length, charPool, edgesPool, edgesPool)
+
+fun generateRandomText(
+    length: Int = RANDOM_TEXT_LENGTH,
+    charPool: List<Char> = RANDOM_TEXT_CHAR_POOL.toList(),
+    prefixPool: List<Char>? = null,
+    suffixPool: List<Char>? = null,
 ): String {
     val poolSize = charPool.size
     if (poolSize < 2) {
@@ -20,23 +27,37 @@ fun generateRandomText(
     val random = SecureRandom()
     val bytes = ByteArray(length)
     random.nextBytes(bytes)
-    return if (edgesPool == null) {
+    val hasNoEdges = prefixPool == null && suffixPool == null
+    return if (hasNoEdges) {
         bytes
             .fold(StringBuilder(length)) { acc, e ->
                 acc.append(charPool[abs(e % poolSize)])
             }.toString()
     } else {
-        val edgesPoolSize = edgesPool.size
-        if (edgesPoolSize < 2) {
-            throw IllegalArgumentException("Char edges pool size must be at least 2")
-        }
         val builder = StringBuilder(length)
-        builder.append(edgesPool[abs(bytes.first() % edgesPoolSize)])
-        bytes.drop(1).dropLast(1)
+        var newBytes = bytes.toList()
+        if (prefixPool != null) {
+            val prefixPoolSize = prefixPool.size
+            if (prefixPoolSize < 2) {
+                throw IllegalArgumentException("Prefix char pool size must be at least 2")
+            }
+            builder.append(prefixPool[abs(bytes.first() % prefixPoolSize)])
+            newBytes = newBytes.drop(1)
+        }
+        if (suffixPool != null) {
+            newBytes = newBytes.dropLast(1)
+        }
+        newBytes
             .fold(builder) { acc, e ->
                 acc.append(charPool[abs(e % poolSize)])
             }
-        builder.append(edgesPool[abs(bytes.last() % edgesPoolSize)])
+        if (suffixPool != null) {
+            val suffixPoolSize = suffixPool.size
+            if (suffixPoolSize < 2) {
+                throw IllegalArgumentException("Suffix char pool size must be at least 2")
+            }
+            builder.append(suffixPool[abs(bytes.first() % suffixPoolSize)])
+        }
         builder.toString()
     }
 }

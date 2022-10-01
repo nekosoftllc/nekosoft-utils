@@ -98,4 +98,15 @@ class RandomTextGeneratorTests {
         }
     }
 
+    @Test
+    fun `suffix and prefix edges are within the given edges pool`() {
+        val alphabet = "abcdefgh".toList()
+        val prefixPool = "12345".toList()
+        val suffixPool = "67890".toList()
+        val str = generateRandomText(charPool = alphabet, prefixPool = prefixPool, suffixPool = suffixPool)
+        assertThat(prefixPool).contains(str.first())
+        assertThat(suffixPool).contains(str.last())
+        assertThat(str.drop(1).dropLast(1).toList()).allMatch { it in alphabet }
+    }
+
 }
