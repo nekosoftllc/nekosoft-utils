@@ -45,14 +45,14 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
                     anonymousKey,
                     originalAuthentication!!.principal,
                     originalAuthentication.credentials,
-                    newAuths,
+                    newAuths.distinct(),
                     originalAuthentication.javaClass,
                 )
             } else {
                 AnonymousAuthenticationToken(
                     anonymousKey,
                     originalAuthentication?.principal ?: "anonymous",
-                    newAuths,
+                    newAuths.distinct(),
                 )
             }
             SecurityContextHolder.getContext().authentication = token
@@ -87,8 +87,8 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * delegated privileges will be assigned, otherwise it will add the roles to the existing authenticated principal.
          */
         fun userWithRoles(vararg roles: String): RunAs {
-            val orgAuth: Authentication = SecurityContextHolder.getContext().authentication
-            return RunAs(orgAuth).prepare(false, *roles)
+            val origAuth: Authentication = SecurityContextHolder.getContext().authentication
+            return RunAs(origAuth).prepare(false, *roles)
         }
 
         /**
@@ -97,8 +97,8 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * user with the given roles, otherwise it will add the roles to the existing authenticated principal.
          */
         fun anonymousWithRoles(vararg roles: String): RunAs {
-            val orgAuth: Authentication = SecurityContextHolder.getContext().authentication
-            return RunAs(orgAuth).prepare(true, *roles)
+            val origAuth: Authentication = SecurityContextHolder.getContext().authentication
+            return RunAs(origAuth).prepare(true, *roles)
         }
     }
 
