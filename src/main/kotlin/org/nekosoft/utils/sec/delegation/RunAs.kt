@@ -30,9 +30,10 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
 
     private val rolePrefix = "ROLE_"    // TODO figure out role prefix from configuration
 
-    private fun prepare(anonymous: Boolean, vararg roles: String): RunAs {
+    private fun prepare(allowAnonymous: Boolean, vararg roles: String): RunAs {
         val isAuthenticated = (originalAuthentication != null) && originalAuthentication.isAuthenticated
-        if (anonymous || (isAuthenticated && originalAuthentication !is AnonymousAuthenticationToken)) {
+        val isNonAnonymousUser = (isAuthenticated && originalAuthentication !is AnonymousAuthenticationToken)
+        if (allowAnonymous || isNonAnonymousUser) {
             // The cast is necessary despite the compiler warning, or otherwise the addAll call will not work
             @Suppress("USELESS_CAST")
             val newAuths = roles
@@ -40,7 +41,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
                 .map { SimpleGrantedAuthority(it) as GrantedAuthority }
                 .toMutableList()
             if (isAuthenticated) newAuths.addAll(originalAuthentication!!.authorities)
-            val token = if (isAuthenticated) {
+            val token = if (isNonAnonymousUser) {
                 RunAsUserToken(
                     anonymousKey,
                     originalAuthentication!!.principal,
@@ -87,7 +88,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * delegated privileges will be assigned, otherwise it will add the roles to the existing authenticated principal.
          */
         fun userWithRoles(vararg roles: String): RunAs {
-            val origAuth: Authentication = SecurityContextHolder.getContext().authentication
+            val origAuth: Authentication? = SecurityContextHolder.getContext().authentication
             return RunAs(origAuth).prepare(false, *roles)
         }
 
@@ -97,7 +98,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * user with the given roles, otherwise it will add the roles to the existing authenticated principal.
          */
         fun anonymousWithRoles(vararg roles: String): RunAs {
-            val origAuth: Authentication = SecurityContextHolder.getContext().authentication
+            val origAuth: Authentication? = SecurityContextHolder.getContext().authentication
             return RunAs(origAuth).prepare(true, *roles)
         }
     }

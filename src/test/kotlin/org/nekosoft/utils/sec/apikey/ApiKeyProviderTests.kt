@@ -11,7 +11,7 @@ import java.util.*
 
 class ApiKeyProviderTests {
     @Test
-    fun `do nothing with no API key and no resolver`() {
+    fun `return null if no server API key and no resolver`() {
         val provider = ApiKeyAuthenticationProvider(
             authenticationResolver = Optional.empty(),
             serverApiKey = null,
@@ -21,7 +21,22 @@ class ApiKeyProviderTests {
     }
 
     @Test
-    fun `exception if server api key does not match`() {
+    fun `if resolver is present, it should be used even if no server API key is present`() {
+        val tk = UsernamePasswordAuthenticationToken("user", "apikey", listOf(SimpleGrantedAuthority("ROLE_API")))
+        val resolver = object : ApiKeyAuthenticationResolver {
+            override fun resolveApiKey(apiKey: String): Authentication =
+                tk
+        }
+        val provider = ApiKeyAuthenticationProvider(
+            authenticationResolver = Optional.of(resolver),
+            serverApiKey = null,
+        )
+        val token = provider.authenticate(ApiKeyAuthenticationToken("anyapikey"))
+        assertEquals(tk, token)
+    }
+
+    @Test
+    fun `exception if server api key does not match given key`() {
         val provider = ApiKeyAuthenticationProvider(
             authenticationResolver = Optional.empty(),
             serverApiKey = "theapikey",
@@ -32,7 +47,7 @@ class ApiKeyProviderTests {
     }
 
     @Test
-    fun `valid token if server api key matches`() {
+    fun `valid token if server api key matches given key`() {
         val provider = ApiKeyAuthenticationProvider(
             authenticationResolver = Optional.empty(),
             serverApiKey = "theapikey",
@@ -89,6 +104,37 @@ class ApiKeyProviderTests {
         assertNotNull(token)
         assertTrue(token!!.isAuthenticated)
         assertEquals(tk, token)
+    }
+
+    @Test
+    fun `provider does nothing with the wrong class`() {
+        val tk = UsernamePasswordAuthenticationToken("user", "apikey", listOf(SimpleGrantedAuthority("ROLE_API")))
+        val provider = ApiKeyAuthenticationProvider(
+            serverApiKey = "theapikey",
+            authenticationResolver = Optional.empty(),
+        )
+        val token = provider.authenticate(tk)
+        assertNull(token)
+    }
+
+    @Test
+    fun `supports method refuses the wrong class`() {
+        val tk = UsernamePasswordAuthenticationToken("user", "apikey", listOf(SimpleGrantedAuthority("ROLE_API")))
+        val provider = ApiKeyAuthenticationProvider(
+            serverApiKey = "theapikey",
+            authenticationResolver = Optional.empty(),
+        )
+        assertFalse(provider.supports(tk.javaClass))
+    }
+
+    @Test
+    fun `supports method accepts the right class`() {
+        val tk = ApiKeyAuthenticationToken("anapikey", "apiuser")
+        val provider = ApiKeyAuthenticationProvider(
+            serverApiKey = "theapikey",
+            authenticationResolver = Optional.empty(),
+        )
+        assertTrue(provider.supports(tk.javaClass))
     }
 
 }

@@ -33,7 +33,7 @@ class ApiKeyAuthenticationProvider(
         return authenticated ?: throw BadCredentialsException("Invalid API Key")
     }
 
-    override fun supports(authentication: Class<*>) =
-        authentication == ApiKeyAuthenticationToken::class.java
+    override fun supports(authClass: Class<*>) =
+        ApiKeyAuthenticationToken::class.java.isAssignableFrom(authClass)
 
 }

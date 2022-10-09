@@ -12,9 +12,8 @@ plugins {
 }
 
 group = "org.nekosoft.utils"
-version = "0.0.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 
-version = "0.0.0-SNAPSHOT"
 gitVersioning.apply {
     // https://github.com/qoomon/gradle-git-versioning-plugin
     refs {
@@ -96,7 +95,7 @@ publishing {
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
-                artifactId = "utils-common"
+                artifactId = "common-utils"
                 from(components["java"])
                 pom {
                     name.set("NekoSoft Utils Common")
