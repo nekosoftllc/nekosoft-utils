@@ -1,4 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -12,23 +11,20 @@ plugins {
 }
 
 group = "org.nekosoft.utils"
-version = "1.0.0-SNAPSHOT"
+version = "0.9.0"
 
-gitVersioning.apply {
-    // https://github.com/qoomon/gradle-git-versioning-plugin
-    refs {
-        branch(".+") {
-            version = "\${ref}-SNAPSHOT"
-        }
-        tag("v(?<version>.*)") {
-            version = "\${ref.version}"
-        }
-    }
-    // optional fallback configuration in case of no matching ref configuration
-    rev {
-        version = "\${commit}"
-    }
-}
+//gitVersioning.apply {
+//    // https://github.com/qoomon/gradle-git-versioning-plugin
+//    refs {
+//        tag("v(?<version>.*)") {
+//            version = "\${ref.version}"
+//        }
+//    }
+//    // optional fallback configuration in case of no matching ref configuration
+//    rev {
+//        version = "\${commit}"
+//    }
+//}
 
 java {
     withJavadocJar()
@@ -46,11 +42,12 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core")
     implementation("org.aspectj:aspectjweaver")
     implementation("jakarta.persistence:jakarta.persistence-api")
+    api("io.github.g0dkar:qrcode-kotlin-jvm:3.2.0")
 
-    testImplementation("io.mockk:mockk:1.12.7")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("io.mockk:mockk:1.12.7")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
