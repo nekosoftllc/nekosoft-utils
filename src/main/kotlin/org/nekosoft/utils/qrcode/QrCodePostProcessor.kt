@@ -1,3 +1,7 @@
 package org.nekosoft.utils.qrcode
 
-interface QrCodePostProcessor
+import java.awt.image.BufferedImage
+
+interface QrCodePostProcessor {
+    fun process(qrcodeImage: BufferedImage, options: QrCodeOptions)
+}

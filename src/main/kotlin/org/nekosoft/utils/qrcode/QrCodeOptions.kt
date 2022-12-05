@@ -8,11 +8,12 @@ class QrCodeOptions(
     fgColor: String,
     mgColor: String,
     mgSize: Int,
-    cllSize: Int,
-    imgSize: Int,
-    dStyle: QrCodeDrawStyle,
-    pProcessor: List<QrCodePostProcessor>,
-    isMaxImgSize: Boolean
+    val cellSize: Int,
+    val imageSize: Int,
+    val drawStyle: QrCodeDrawStyle,
+    val postProcessors: List<QrCodePostProcessor>,
+    val isMaxImageSize: Boolean,
+    val correctionLevel: CorrectionLevel,
 ) {
     companion object {
         operator fun invoke(
@@ -25,6 +26,7 @@ class QrCodeOptions(
             drawStyle: QrCodeDrawStyle? = null,
             postProcessor: List<QrCodePostProcessor>? = null,
             isMaxImageSize: Boolean? = null,
+            correctionLevel: CorrectionLevel? = null,
         ) = QrCodeOptions(
             bgColor ?: "#FFFFFFFF",
             fgColor ?: "#FF000000",
@@ -34,7 +36,8 @@ class QrCodeOptions(
             imageSize ?: -1, // <= 0 : use cell size
             drawStyle ?: DefaultDrawStyle(),
             postProcessor ?: listOf(),
-            isMaxImageSize ?: false
+            isMaxImageSize ?: false,
+            correctionLevel ?: CorrectionLevel.M,
         )
     }
 
@@ -42,23 +45,18 @@ class QrCodeOptions(
     val foregroundColor: Int
     val marginColor: Int
     val marginSize: Int
-    val cellSize: Int = cllSize
-    val imageSize: Int = imgSize
-    val drawStyle: QrCodeDrawStyle = dStyle
-    val postProcessor: List<QrCodePostProcessor> = pProcessor
-    val isMaxImageSize: Boolean = isMaxImgSize
 
     init {
         backgroundColor = parseColorString(bgColor)
         foregroundColor = parseColorString(fgColor)
         marginColor = if (mgColor.isBlank()) backgroundColor else parseColorString(mgColor)
-        if (!((cllSize <= 0) xor (imgSize <= 0))) {
+        if (!((cellSize <= 0) xor (imageSize <= 0))) {
             throw IllegalArgumentException("Must specify one and only one of image size or cell size")
         }
-        if (cllSize <= 0 && mgSize <= 0) {
+        if (cellSize <= 0 && mgSize <= 0) {
             throw IllegalArgumentException("You must specify a margin size if you don't provide a cell size")
         }
-        marginSize = if (mgSize <= 0) cllSize else mgSize
+        marginSize = if (mgSize <= 0) cellSize else mgSize
     }
 
     private fun parseColorString(color: String): Int =

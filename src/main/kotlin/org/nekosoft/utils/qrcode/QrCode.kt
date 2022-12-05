@@ -1,25 +1,24 @@
 package org.nekosoft.utils.qrcode
 
-import io.github.g0dkar.qrcode.ErrorCorrectionLevel
 import io.github.g0dkar.qrcode.QRCode
 import io.github.g0dkar.qrcode.QRCodeDataType
 import org.nekosoft.utils.qrcode.style.DefaultDrawStyle
+import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import kotlin.math.ceil
 import kotlin.math.floor
 
 class QrCode(
     val data: String,
-    val errorCorrectionLevel: ErrorCorrectionLevel = ErrorCorrectionLevel.M,
     val type: QRCodeDataType? = null
     ) {
 
     fun render(options: QrCodeOptions): ByteArrayOutputStream {
         val qrCode =
             if (type == null)
-                QRCode(data, errorCorrectionLevel = errorCorrectionLevel)
+                QRCode(data, errorCorrectionLevel = options.correctionLevel.errorCorrectionLevel)
             else
-                QRCode(data, dataType = type, errorCorrectionLevel = errorCorrectionLevel)
+                QRCode(data, dataType = type, errorCorrectionLevel = options.correctionLevel.errorCorrectionLevel)
 
         val rawData = qrCode.encode()
 
@@ -36,7 +35,7 @@ class QrCode(
 
         val imageOut = ByteArrayOutputStream()
 
-        (if (options.drawStyle is DefaultDrawStyle) {
+        val qrGraphics = (if (options.drawStyle is DefaultDrawStyle) {
             qrCode.render(
                 margin = options.marginSize,
                 cellSize = actualCellSize,
@@ -51,8 +50,15 @@ class QrCode(
                 cellSize = actualCellSize,
                 rawData = rawData,
             ) { qrCodeSquare, qrCodeGraphics -> options.drawStyle.render(qrCodeSquare, qrCodeGraphics, rawData, options) }
-        }).writeImage(imageOut)
+        })
 
+        // Returns a BufferedImage instance on JVM platform
+        val bufImg = qrGraphics.nativeImage() as BufferedImage
+        for (p in options.postProcessors) {
+            p.process(bufImg, options)
+        }
+
+        qrGraphics.writeImage(imageOut)
         return imageOut
     }
 
