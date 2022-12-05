@@ -9,6 +9,8 @@ import org.nekosoft.utils.qrcode.QrCodeOptions
 
 class RoundedDrawStyle(val radius: Int = 15, val joined: Boolean = false) : QrCodeDrawStyle {
 
+    override fun validate(options: QrCodeOptions): Boolean = true
+
     override fun render(
         cellData: QRCodeSquare,
         canvas: QRCodeGraphics,

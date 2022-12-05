@@ -6,6 +6,9 @@ import org.nekosoft.utils.qrcode.QrCodeDrawStyle
 import org.nekosoft.utils.qrcode.QrCodeOptions
 
 class DefaultDrawStyle : QrCodeDrawStyle {
+
+    override fun validate(options: QrCodeOptions): Boolean = true
+
     override fun render(
         cellData: QRCodeSquare,
         canvas: QRCodeGraphics,

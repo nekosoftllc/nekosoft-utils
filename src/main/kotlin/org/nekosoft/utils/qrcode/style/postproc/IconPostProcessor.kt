@@ -8,7 +8,9 @@ import javax.imageio.ImageIO
 
 class IconPostProcessor(val imagePath: String) : QrCodePostProcessor {
 
-    val overlayImage = ImageIO.read(File(imagePath))
+    val overlayImage: BufferedImage = ImageIO.read(File(imagePath))
+
+    override fun validate(options: QrCodeOptions): Boolean = true
 
     override fun process(qrcodeImage: BufferedImage, options: QrCodeOptions) {
         // TODO Check sizes against error level percentage and resize image accordingly
