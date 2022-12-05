@@ -14,6 +14,12 @@ class QrCode(
     ) {
 
     fun render(options: QrCodeOptions): ByteArrayOutputStream {
+        // Validate draw style and post processors
+        if (!options.drawStyle.validate(options)) throw IllegalArgumentException("Invalid QR Code options for the selected drawing style ${options.drawStyle.javaClass.name}")
+        options.postProcessors.forEach {
+            if (!it.validate(options)) throw IllegalArgumentException("Invalid QR Code options for the selected post processor ${it.javaClass.name}")
+        }
+
         val qrCode =
             if (type == null)
                 QRCode(data, errorCorrectionLevel = options.correctionLevel.errorCorrectionLevel)
@@ -45,6 +51,7 @@ class QrCode(
                 marginColor = options.marginColor,
             )
         } else {
+
             qrCode.renderShaded(
                 margin = options.marginSize,
                 cellSize = actualCellSize,
