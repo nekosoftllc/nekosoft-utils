@@ -8,7 +8,7 @@ class QrCodeOptions(
     fgColor: String,
     mgColor: String,
     mgSize: Int,
-    val cellSize: Int,
+    clSize: Int,
     val imageSize: Int,
     val drawStyle: QrCodeDrawStyle,
     val postProcessors: List<QrCodePostProcessor>,
@@ -16,6 +16,7 @@ class QrCodeOptions(
     val correctionLevel: CorrectionLevel,
 ) {
     companion object {
+
         operator fun invoke(
             bgColor: String? = null,
             fgColor: String? = null,
@@ -32,39 +33,42 @@ class QrCodeOptions(
             fgColor ?: "#FF000000",
             marginColor ?: "", // "" : same as bgColor
             marginSize ?: -1, // <= 0 : same as cell size
-            cellSize ?: 25, // <= 0 : calculate from image size
+            cellSize ?: -1, // <= 0 : calculate from image size
             imageSize ?: -1, // <= 0 : use cell size
             drawStyle ?: DefaultDrawStyle(),
             postProcessor ?: listOf(),
             isMaxImageSize ?: false,
             correctionLevel ?: CorrectionLevel.M,
         )
+
+        fun parseColorString(color: String): Int =
+            if (color.startsWith("#") && color.length == 7) {
+                Colors.css(color)
+            } else if (color.startsWith("#") && color.length == 9) {
+                Colors.withAlpha(color.substring(3..8).toInt(16), color.substring(1..2).toInt(16))
+            } else
+                Colors.allColors()[color] ?: throw IllegalArgumentException(color)
+
     }
 
     val backgroundColor: Int
     val foregroundColor: Int
     val marginColor: Int
     val marginSize: Int
+    val cellSize: Int
 
     init {
         backgroundColor = parseColorString(bgColor)
         foregroundColor = parseColorString(fgColor)
         marginColor = if (mgColor.isBlank()) backgroundColor else parseColorString(mgColor)
-        if (!((cellSize <= 0) xor (imageSize <= 0))) {
+        cellSize = if (clSize <= 0 && imageSize <= 0) {
+            25
+        } else if (!((clSize <= 0) xor (imageSize <= 0))) {
             throw IllegalArgumentException("Must specify one and only one of image size or cell size")
+        } else {
+            clSize
         }
-        if (cellSize <= 0 && mgSize <= 0) {
-            throw IllegalArgumentException("You must specify a margin size if you don't provide a cell size")
-        }
-        marginSize = if (mgSize <= 0) cellSize else mgSize
+        marginSize = if (mgSize <= 0) if (cellSize > 0) cellSize else 0 else mgSize
     }
-
-    private fun parseColorString(color: String): Int =
-        if (color.startsWith("#") && color.length == 7) {
-            Colors.css(color)
-        } else if (color.startsWith("#") && color.length == 9) {
-            Colors.withAlpha(color.substring(3..8).toInt(16), color.substring(1..2).toInt(16))
-        } else
-            Colors.allColors()[color] ?: throw IllegalArgumentException(color)
 
 }
