@@ -7,7 +7,7 @@ class QrCodeOptions(
     bgColor: String,
     fgColor: String,
     mgColor: String,
-    mgSize: Int,
+    val marginSize: Int,
     clSize: Int,
     val imageSize: Int,
     val drawStyle: QrCodeDrawStyle,
@@ -54,7 +54,6 @@ class QrCodeOptions(
     val backgroundColor: Int
     val foregroundColor: Int
     val marginColor: Int
-    val marginSize: Int
     val cellSize: Int
 
     init {
@@ -68,7 +67,6 @@ class QrCodeOptions(
         } else {
             clSize
         }
-        marginSize = if (mgSize <= 0) if (cellSize > 0) cellSize else 0 else mgSize
     }
 
 }

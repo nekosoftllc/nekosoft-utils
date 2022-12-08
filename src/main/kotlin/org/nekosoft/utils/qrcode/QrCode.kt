@@ -27,22 +27,31 @@ class QrCode(
 
         val rawData = qrCode.encode()
 
-        val actualCellSize = if (options.imageSize > 0) {
-            val csz = (options.imageSize.toDouble() - options.marginSize * 2) / rawData.size
+        val actualCellSize = if (options.cellSize > 0) {
+            options.cellSize
+        } else if (options.imageSize > 0) {
+            val csz = if (options.marginSize > 0) {
+                (options.imageSize.toDouble() - options.marginSize * 2.0) / rawData.size
+            } else {
+                options.imageSize.toDouble() / (rawData.size + 2.0)
+            }
             if (options.isMaxImageSize) {
                 floor(csz)
             } else {
                 ceil(csz)
             }.toInt()
         } else {
-            options.cellSize
+            // This should never happen based on check in options object
+            throw IllegalArgumentException("Must specify one and only one of image size or cell size")
         }
+
+        val actualMarginSize = if (options.marginSize > 0) options.marginSize else actualCellSize
 
         val imageOut = ByteArrayOutputStream()
 
         val qrGraphics = (if (options.drawStyle is DefaultDrawStyle) {
             qrCode.render(
-                margin = options.marginSize,
+                margin = actualMarginSize,
                 cellSize = actualCellSize,
                 rawData = rawData,
                 darkColor = options.foregroundColor,
@@ -50,7 +59,6 @@ class QrCode(
                 marginColor = options.marginColor,
             )
         } else {
-
             qrCode.renderShaded(
                 margin = options.marginSize,
                 cellSize = actualCellSize,
