@@ -21,6 +21,7 @@ class IconPostProcessor(val imagePath: String) : QrCodePostProcessor {
         val posY = (qrcodeImage.height - overlayImage.height) / 2
         val g = (qrcodeImage.nativeImage() as BufferedImage).createGraphics()
         g.drawImage(overlayImage, posX, posY, null)
+        g.dispose()
         return null
     }
 

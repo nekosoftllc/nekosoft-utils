@@ -42,6 +42,7 @@ class FramePostProcessor(
         val captionY = (baseWidth * 1.263).toInt()
         g.color = Color(actualBg, true)
         g.drawString(caption, captionX, captionY)
+        g.dispose()
         return qrGraphics
     }
 
