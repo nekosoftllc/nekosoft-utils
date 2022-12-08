@@ -1,6 +1,7 @@
 package org.nekosoft.utils.qrcode
 
 import org.nekosoft.utils.qrcode.style.RoundedDrawStyle
+import org.nekosoft.utils.qrcode.style.postproc.FramePostProcessor
 import org.nekosoft.utils.qrcode.style.postproc.IconPostProcessor
 import java.io.FileOutputStream
 
@@ -10,11 +11,11 @@ fun main() {
             .render(QrCodeOptions(
                 fgColor = "#000000",
                 bgColor = "#EBFDF7",
-                drawStyle = RoundedDrawStyle(25, false),
+                drawStyle = RoundedDrawStyle(25, true),
                 postProcessor = listOf(
                     IconPostProcessor("/Users/fedmest/Downloads/QRCode_QA.png"),
+                    FramePostProcessor("MY QR CODE"),
                 ),
-                correctionLevel = CorrectionLevel.Q,
             ))
         result.writeTo(it)
     }
