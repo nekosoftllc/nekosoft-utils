@@ -3,7 +3,6 @@ package org.nekosoft.utils.qrcode
 import io.github.g0dkar.qrcode.QRCode
 import io.github.g0dkar.qrcode.QRCodeDataType
 import org.nekosoft.utils.qrcode.style.DefaultDrawStyle
-import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -60,12 +59,12 @@ class QrCode(
         })
 
         // Returns a BufferedImage instance on JVM platform
-        val bufImg = qrGraphics.nativeImage() as BufferedImage
+        var finalQRCodeGraphics = qrGraphics
         for (p in options.postProcessors) {
-            p.process(bufImg, options)
+            p.process(finalQRCodeGraphics, options)?.let { finalQRCodeGraphics = it }
         }
 
-        qrGraphics.writeImage(imageOut)
+        finalQRCodeGraphics.writeImage(imageOut)
         return imageOut
     }
 
