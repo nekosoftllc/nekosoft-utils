@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "org.nekosoft.utils"
-version = "0.9.0"
+version = "0.9.1"
 
 //gitVersioning.apply {
 //    // https://github.com/qoomon/gradle-git-versioning-plugin

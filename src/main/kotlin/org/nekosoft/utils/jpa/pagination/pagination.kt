@@ -1,3 +1,5 @@
+@file:JvmName("NekosoftJpaPaginationUtils")
+
 package org.nekosoft.utils.jpa.pagination
 
 import org.springframework.data.domain.PageImpl

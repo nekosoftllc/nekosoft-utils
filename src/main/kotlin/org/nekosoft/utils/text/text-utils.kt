@@ -1,3 +1,5 @@
+@file:JvmName("NekosoftTextUtils")
+
 package org.nekosoft.utils.text
 
 // Inspired by https://www.baeldung.com/kotlin/random-alphanumeric-string

@@ -71,6 +71,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * A string set to identify if the token object was made by an authorised client.
          * Must be set before
          */
+        @JvmStatic
         var anonymousKey: String = ""
             get() = field.ifEmpty {
                 throw IllegalStateException("RunAS delegation key must be set before use")
@@ -87,6 +88,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * If there is no authenticated principal at the moment of the call, this will not do anything and no
          * delegated privileges will be assigned, otherwise it will add the roles to the existing authenticated principal.
          */
+        @JvmStatic
         fun userWithRoles(vararg roles: String): RunAs {
             val origAuth: Authentication? = SecurityContextHolder.getContext().authentication
             return RunAs(origAuth).prepare(false, *roles)
@@ -97,6 +99,7 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
          * If there is no authenticated principal at the moment of the call, this will create a new anonymous
          * user with the given roles, otherwise it will add the roles to the existing authenticated principal.
          */
+        @JvmStatic
         fun anonymousWithRoles(vararg roles: String): RunAs {
             val origAuth: Authentication? = SecurityContextHolder.getContext().authentication
             return RunAs(origAuth).prepare(true, *roles)
