@@ -14,6 +14,7 @@ data class PaginationData(
 
     companion object {
 
+        @JvmStatic
         fun fromPage(page: Page<*>): PaginationData = PaginationData(
             currentPage = page.number + 1,
             pageSize = page.size,
@@ -22,10 +23,11 @@ data class PaginationData(
             totalSize = page.totalElements,
         )
 
-        fun paginationToPageable(pagination: PaginationOptions): Pageable = if (pagination.page == null) {
+        @JvmStatic
+        fun paginationToPageable(pagination: PaginationOptions): Pageable = if (pagination.page == null && pagination.pageSize == null) {
             Pageable.unpaged()
         } else {
-            PageRequest.of(pagination.page!!, pagination.pageSize ?: 100)
+            PageRequest.of((pagination.page ?: 1) - 1, pagination.pageSize ?: 100)
         }
 
     }

@@ -77,10 +77,12 @@ class RunAs private constructor(private val originalAuthentication: Authenticati
                 throw IllegalStateException("RunAS delegation key must be set before use")
             }
             set(value) {
-                if (field.isNotEmpty()) {
+                if (field.isEmpty()) {
+                    field = value
+                } else if (field != value) {
                     throw IllegalStateException("RunAS delegation key cannot be changed")
                 }
-                field = value
+                // allow key to be set to the same value more than once, as this is needed in testing
             }
 
         /**
